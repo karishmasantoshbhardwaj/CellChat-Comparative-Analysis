@@ -7,6 +7,11 @@
 library(CellChat)
 library(Matrix)
 
+# Create output directories if they do not exist
+dir.create("results/tables", recursive = TRUE, showWarnings = FALSE)
+dir.create("results/figures", recursive = TRUE, showWarnings = FALSE)
+dir.create("data/processed", recursive = TRUE, showWarnings = FALSE)
+
 # ------------------------------------------------------------
 # 1. LOAD PROCESSED RUN 2 DATA
 # ------------------------------------------------------------
@@ -183,64 +188,7 @@ cellchat2 <- netAnalysis_computeCentrality(
 )
 
 # ------------------------------------------------------------
-# 13. COMMUNICATION COUNT FIGURE
-# ------------------------------------------------------------
-
-pdf(
-  "results/figures/run2_communication_count.pdf",
-  width = 10,
-  height = 9
-)
-
-netVisual_circle(
-  communication_count2,
-  vertex.weight = groupSize2,
-  weight.scale = TRUE,
-  label.edge = FALSE,
-  title.name = "Run 2: Number of interactions"
-)
-
-dev.off()
-
-# ------------------------------------------------------------
-# 14. COMMUNICATION STRENGTH FIGURE
-# ------------------------------------------------------------
-
-pdf(
-  "results/figures/run2_communication_weight.pdf",
-  width = 10,
-  height = 9
-)
-
-netVisual_circle(
-  communication_weight2,
-  vertex.weight = groupSize2,
-  weight.scale = TRUE,
-  label.edge = FALSE,
-  title.name = "Run 2: Interaction strength"
-)
-
-dev.off()
-
-# ------------------------------------------------------------
-# 15. BUBBLE PLOT
-# ------------------------------------------------------------
-
-pdf(
-  "results/figures/run2_communication_bubble.pdf",
-  width = 13,
-  height = 10
-)
-
-netVisual_bubble(
-  cellchat2,
-  remove.isolate = TRUE
-)
-
-dev.off()
-
-# ------------------------------------------------------------
-# 16. SAVE FINAL CELLCHAT OBJECT
+# 13. SAVE FINAL CELLCHAT OBJECT
 # ------------------------------------------------------------
 
 saveRDS(
@@ -249,7 +197,7 @@ saveRDS(
 )
 
 # ------------------------------------------------------------
-# 17. FINAL SUMMARY
+# 14. FINAL SUMMARY
 # ------------------------------------------------------------
 
 cat("\n====================================\n")
@@ -265,7 +213,7 @@ cat("Identified pathways:", length(pathways2), "\n")
 cat("\nRUN 2 ANALYSIS COMPLETED SUCCESSFULLY\n")
 
 # ------------------------------------------------------------
-# 18. RELEASE TEMPORARY DATA MEMORY
+# 15. RELEASE TEMPORARY DATA MEMORY
 # ------------------------------------------------------------
 
 rm(data.run2, meta.run2)
