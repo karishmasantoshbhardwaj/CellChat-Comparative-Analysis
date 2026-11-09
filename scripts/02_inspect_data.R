@@ -7,6 +7,9 @@
 # Load required package
 library(CellChat)
 
+# Verify that the dataset exists
+stopifnot(file.exists("data/raw/data_humanSkin_CellChat.rda"))
+
 # Load the downloaded dataset
 load("data/raw/data_humanSkin_CellChat.rda")
 
