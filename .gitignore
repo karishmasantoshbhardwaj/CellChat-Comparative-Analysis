@@ -1,0 +1,17 @@
+# Raw datasets - download using scripts/01_download_data.R
+data/raw/*
+!data/raw/.gitkeep
+
+# R and RStudio temporary files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.log
+*.bak
