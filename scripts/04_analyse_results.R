@@ -6,6 +6,12 @@ library(CellChat)
 
 dir.create('results/tables', recursive = TRUE, showWarnings = FALSE)
 
+# Check that both CellChat result files exist
+stopifnot(
+  file.exists("data/processed/cellchat_run1_final.rds"),
+  file.exists("data/processed/cellchat_run2_final.rds")
+)
+
 # Load completed analyses
 cellchat1 <- readRDS('data/processed/cellchat_run1_final.rds')
 cellchat2 <- readRDS('data/processed/cellchat_run2_final.rds')
