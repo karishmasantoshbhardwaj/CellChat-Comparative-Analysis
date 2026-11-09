@@ -14,6 +14,13 @@
 
 library(CellChat)
 
+# Create output directories if they do not exist
+dir.create("results/tables", recursive = TRUE, showWarnings = FALSE)
+dir.create("results/figures", recursive = TRUE, showWarnings = FALSE)
+dir.create("data/processed", recursive = TRUE, showWarnings = FALSE)
+
+# Verify that the dataset exists
+stopifnot(file.exists("data/raw/data_humanSkin_CellChat.rda"))
 
 # ============================================================
 # 2. Load original dataset
@@ -301,64 +308,7 @@ write.csv(
 
 
 # ============================================================
-# 18. Generate communication network figures
-# ============================================================
-
-# Figure 1: Number of interactions
-pdf(
-  "results/figures/run1_communication_count.pdf",
-  width = 10,
-  height = 10
-)
-
-netVisual_circle(
-  communication_count,
-  vertex.weight = groupSize,
-  weight.scale = TRUE,
-  label.edge = FALSE,
-  title.name = "Number of interactions"
-)
-
-dev.off()
-
-
-# Figure 2: Interaction strength
-pdf(
-  "results/figures/run1_communication_weight.pdf",
-  width = 10,
-  height = 10
-)
-
-netVisual_circle(
-  communication_weight,
-  vertex.weight = groupSize,
-  weight.scale = TRUE,
-  label.edge = FALSE,
-  title.name = "Interaction strength"
-)
-
-dev.off()
-
-
-# Figure 3: Ligand-receptor communication bubble plot
-pdf(
-  "results/figures/run1_communication_bubble.pdf",
-  width = 14,
-  height = 12
-)
-
-print(
-  netVisual_bubble(
-    cellchat,
-    remove.isolate = TRUE
-  )
-)
-
-dev.off()
-
-
-# ============================================================
-# 19. Save final Run 1 CellChat object
+# 18. Save final Run 1 CellChat object
 # ============================================================
 
 saveRDS(
