@@ -2,53 +2,70 @@
 
 ## 1. Overview
 
-Two CellChat analyses were performed using different skin datasets, species, biological conditions, and communication inference parameters. The purpose was to investigate inferred cell-cell communication networks and examine how the resulting interaction patterns differed.
+CellChat was applied twice to the same human lesional skin (LS) single-cell RNA sequencing dataset to investigate how different averaging methods affect inferred cell–cell communication.
 
-## 2. Run 1: Human lesional skin
+Both runs used the same 5,011 cells, 17,328 genes, 12 cell populations and human CellChat database. The primary difference was the method used to calculate average gene expression across cell populations.
 
-The first analysis used human skin single-cell data and included 5,011 lesional (LS) cells from four patients. The standard CellChat triMean method was used, with population.size = FALSE and 100 bootstraps.
+- **Run 1:** triMean averaging method.
+- **Run 2:** truncatedMean averaging method with trim = 0.1.
 
-The analysis identified 991 filtered ligand-receptor interactions across 12 cell populations and 33 signalling pathways.
+All other inference parameters were kept constant.
 
-COLLAGEN, MIF, GALECTIN, LAMININ and MHC-II were among the most represented pathways. MIF-related interactions were prominent among inflammatory T cells, Langerhans cells and conventional dendritic cells. This suggests that immune-cell communication is an important feature of the inferred lesional skin network.
+## 2. Run 1 – Baseline Analysis (triMean)
 
-## 3. Run 2: Mouse unwounded aged skin
+The baseline analysis identified:
 
-The second analysis used the P616 sample, annotated as UW_Aged, containing 7,552 cells across 12 cell populations. Communication probabilities were inferred using the truncatedMean method with trim = 0.1, population.size = TRUE and 200 bootstraps.
+- 991 significant ligand–receptor interactions.
+- 33 signalling pathways.
+- 12 cell populations.
 
-The analysis identified 10,197 filtered ligand-receptor interactions and 140 signalling pathways.
+The results showed inferred communication involving extracellular matrix and immune-associated signalling pathways. COLLAGEN, MIF, GALECTIN, LAMININ and MHC-II were among the prominent pathways.
 
-COLLAGEN, LAMININ, WNT, THBS and SEMA3 were among the most represented pathways. The strongest displayed interactions included collagen-related signalling from fibroblasts towards interfollicular epidermal keratinocytes, as well as Ppia-Bsg signalling involving keratinocytes.
+MIF-associated communication involved inflammatory T cells, Langerhans cells and conventional dendritic cells.
 
-These patterns suggest prominent inferred extracellular-matrix and epithelial communication in this mouse sample.
+## 3. Run 2 – Modified Analysis (truncatedMean)
 
-## 4. Pathway comparison
+Using truncatedMean averaging with trim = 0.1, the analysis identified:
 
-The pathway comparison identified 32 pathways shared between the two analyses, one pathway unique to Run 1 (ANNEXIN), and 108 pathways unique to Run 2.
+- 3,419 significant ligand–receptor interactions.
+- 78 signalling pathways.
+- The same 12 cell populations.
 
-COLLAGEN and LAMININ were represented among the prominent pathways in both analyses. However, the top-ranked pathway patterns differed: MIF and immune-associated signalling were prominent in the human lesional dataset, while WNT, SEMA3 and other pathways were prominent in the mouse aged-skin dataset.
+The modified averaging method resulted in a larger set of inferred interactions and identified pathways compared with the baseline analysis.
 
-The difference in the number of inferred pathways should not be interpreted as evidence that one biological condition has greater signalling activity. The analyses differ in species, dataset, cell composition, sample structure and inference parameters.
+## 4. Comparative Analysis
 
-## 5. Interpretation of the parameter changes
+The comparison between the two runs showed:
 
-The communication inference settings differed between the two runs. Run 1 used triMean, population.size = FALSE and 100 bootstraps. Run 2 used truncatedMean with trim = 0.1, population.size = TRUE and 200 bootstraps.
+| Metric | Run 1 | Run 2 |
+|---|---:|---:|
+| Averaging method | triMean | truncatedMean |
+| Inferred interactions | 991 | 3,419 |
+| Signalling pathways | 33 | 78 |
+| Shared pathways | 33 | 33 |
+| Run-specific pathways | 0 | 45 |
 
-These changes affect how average expression and cell-group representation contribute to inferred communication probabilities. The resulting networks therefore reflect both dataset-specific biology and methodological differences.
+All 33 pathways identified in Run 1 were also identified in Run 2. An additional 45 pathways were identified only in Run 2.
 
-Because several factors changed simultaneously, this analysis cannot isolate the effect of any individual parameter. A controlled sensitivity analysis using the same dataset and changing one parameter at a time would be required to attribute an observed difference specifically to a parameter.
+The results indicate that the averaging method influences the number of inferred cell–cell communication interactions and pathways detected by CellChat.
+
+## 5. Interpretation
+
+The increase in inferred interactions from 991 to 3,419 suggests that truncatedMean with trim = 0.1 identifies a broader set of potential ligand–receptor interactions than triMean in this dataset.
+
+However, a higher number of inferred interactions does not necessarily indicate stronger biological communication. The difference reflects the sensitivity of CellChat's inference results to the averaging method.
+
+The shared pathways suggest that some signalling patterns remain detectable under both parameter settings, while the additional pathways in Run 2 indicate that the choice of averaging method can influence pathway detection.
 
 ## 6. Limitations
 
-- Run 1 pools lesional cells from four patients; the analysis does not perform patient-level differential communication testing.
-- Run 2 uses one mouse sample (P616), so its results are descriptive and cannot establish population-level patterns.
-- The datasets differ in species, condition, cell composition and experimental context.
-- Differences in inferred interaction counts and probabilities cannot be attributed solely to the parameter changes.
-- CellChat infers potential ligand-receptor communication from expression data; these results do not demonstrate experimentally validated interactions or direct pathway activity.
-- A displayed p-value of 0 can reflect numerical rounding and should not be interpreted as a literal probability of zero.
+- CellChat predicts potential cell–cell communication based on gene expression and known ligand–receptor interactions; it does not experimentally confirm communication.
+- The comparison evaluates two averaging methods on one dataset and does not establish which method is universally better.
+- The analysis does not independently validate the additional interactions identified in Run 2.
+- Differences in inferred interaction counts should not be interpreted as direct measurements of biological communication strength.
 
-## 7. Overall conclusion
+## 7. Conclusion
 
-Both analyses identified complex cell-cell communication networks in skin. The human lesional dataset showed prominent immune-associated communication, including MIF-related interactions, whereas the mouse unwounded aged-skin sample showed prominent fibroblast-keratinocyte and extracellular-matrix-associated communication.
+This experiment demonstrates that changing the CellChat averaging method from triMean to truncatedMean (trim = 0.1), while keeping the dataset and other parameters constant, substantially affects the inferred communication network.
 
-The comparison demonstrates how inferred networks can differ across datasets and analytical settings. However, controlled experiments are needed to distinguish biological differences from the effects of methodological choices.
+The modified method identified more ligand–receptor interactions and signalling pathways, demonstrating the importance of parameter selection when analysing cell–cell communication.

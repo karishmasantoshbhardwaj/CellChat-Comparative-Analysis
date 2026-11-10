@@ -1,13 +1,13 @@
 "Cell_population","Cell_count"
-"Dermal Sheath/Dermal Papilla",748
-"Endothelial Cells",113
-"Fibroblasts 1",1202
-"Fibroblasts 2",758
-"Hair Follicle/Proliferative Cells",1183
-"IFE Keratinocytes",1972
-"Macrophages/Dendritic Cells",387
-"Mast Cells",135
-"Muscle Cells",257
-"Neutrophils",24
-"Pericytes",49
-"T-cells",724
+"APOE+ FIB",1228
+"FBN1+ FIB",813
+"COL11A1+ FIB",181
+"Inflam. FIB",484
+"cDC1",121
+"cDC2",294
+"LC",67
+"Inflam. DC",81
+"TC",765
+"Inflam. TC",266
+"CD40LG+ TC",630
+"NKT",81

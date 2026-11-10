@@ -36,7 +36,12 @@ generate_network_figures <- function(cellchat, prefix, label) {
 }
 
 # Generate figures for both datasets
-generate_network_figures(cellchat1, 'run1', 'Run 1: Human Lesional Skin')
-generate_network_figures(cellchat2, 'run2', 'Run 2: Mouse Unwounded Aged Skin')
+generate_network_figures(
+  cellchat1, 'run1', 'Run 1: Human LS (triMean)'
+)
+
+generate_network_figures(
+  cellchat2, 'run2', 'Run 2: Human LS (truncatedMean)'
+)
 
 cat('\nAll individual CellChat figures generated successfully.\n')

@@ -48,6 +48,13 @@ print(dim(data.LS))
 print(dim(meta.LS))
 print(identical(colnames(data.LS), rownames(meta.LS)))
 
+# Verify the expected number of LS cells
+stopifnot(
+  ncol(data.LS) == 5011,
+  nrow(meta.LS) == 5011,
+  identical(colnames(data.LS), rownames(meta.LS))
+)
+
 
 # ============================================================
 # 4. Save prepared dataset

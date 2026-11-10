@@ -44,7 +44,10 @@ write.csv(cellchat2@net$weight, 'results/tables/run2_communication_weight.csv')
 
 # Overall summary
 summary <- data.frame(
-  Run = c('Run 1: Human LS', 'Run 2: Mouse UW_Aged'),
+  Run = c(
+    'Run 1: Human LS (triMean)',
+    'Run 2: Human LS (truncatedMean)'
+  ),
   Cells = c(ncol(cellchat1@data), ncol(cellchat2@data)),
   Genes = c(nrow(cellchat1@data), nrow(cellchat2@data)),
   Populations = c(length(levels(cellchat1@idents)), length(levels(cellchat2@idents))),

@@ -1,220 +1,104 @@
 
 # ============================================================
-# RUN 2: CELLCHAT ANALYSIS
-# Mouse Unwounded Aged Skin Dataset
+# CellChat Project
+# Script: 06_run_cellchat_run2.R
+# Purpose: Parameter comparison using the SAME human LS dataset
+# Run 2: Modified averaging method
 # ============================================================
 
 library(CellChat)
-library(Matrix)
 
-# Create output directories if they do not exist
 dir.create("results/tables", recursive = TRUE, showWarnings = FALSE)
 dir.create("results/figures", recursive = TRUE, showWarnings = FALSE)
 dir.create("data/processed", recursive = TRUE, showWarnings = FALSE)
 
-# ------------------------------------------------------------
-# 1. LOAD PROCESSED RUN 2 DATA
-# ------------------------------------------------------------
-
-run2_data <- readRDS(
-  "data/processed/mouseSkin_UW_Aged.rds"
+# Load the SAME human LS CellChat object used for Run 1,
+# saved after overexpressed ligand-receptor identification.
+cellchat <- readRDS(
+  "data/processed/cellchat_run1_overexpressed_interactions.rds"
 )
 
-data.run2 <- run2_data$data
-meta.run2 <- run2_data$meta
+# Confirm the dataset and cell populations
+print(table(cellchat@idents))
+print(dim(cellchat@data))
 
-rm(run2_data)
-
-# Verify data alignment
-stopifnot(
-  identical(colnames(data.run2), rownames(meta.run2))
-)
-
-cat("Run 2 data loaded successfully\n")
-cat("Genes:", nrow(data.run2), "\n")
-cat("Cells:", ncol(data.run2), "\n")
-cat("Cell populations:", length(unique(meta.run2$labels)), "\n")
-
-# ------------------------------------------------------------
-# 2. PREPARE CELL ANNOTATIONS
-# ------------------------------------------------------------
-
-meta.run2$labels <- factor(meta.run2$labels)
-
-cat("\nCell population distribution:\n")
-print(table(meta.run2$labels))
-
-# ------------------------------------------------------------
-# 3. CREATE CELLCHAT OBJECT
-# ------------------------------------------------------------
-
-cellchat2 <- createCellChat(
-  object = data.run2,
-  meta = meta.run2,
-  group.by = "labels"
-)
-
-# Use mouse-specific CellChat database
-cellchat2@DB <- CellChatDB.mouse
-
-# ------------------------------------------------------------
-# 4. PREPROCESS DATA
-# ------------------------------------------------------------
-
-cellchat2 <- subsetData(cellchat2)
-
-cat("\nSignaling data dimensions:\n")
-print(dim(cellchat2@data.signaling))
-
-# ------------------------------------------------------------
-# 5. IDENTIFY OVEREXPRESSED GENES
-# ------------------------------------------------------------
-
-cellchat2 <- identifyOverExpressedGenes(
-  cellchat2,
-  do.fast = FALSE
-)
-
-saveRDS(
-  cellchat2,
-  "data/processed/cellchat_run2_overexpressed_genes.rds"
-)
-
-# ------------------------------------------------------------
-# 6. IDENTIFY OVEREXPRESSED INTERACTIONS
-# ------------------------------------------------------------
-
-cellchat2 <- identifyOverExpressedInteractions(cellchat2)
-
-saveRDS(
-  cellchat2,
-  "data/processed/cellchat_run2_overexpressed_interactions.rds"
-)
-
-# ------------------------------------------------------------
-# 7. COMPUTE COMMUNICATION PROBABILITIES
-# ------------------------------------------------------------
-
-cellchat2 <- computeCommunProb(
-  cellchat2,
+# Calculate communication probabilities using modified parameters
+cellchat <- computeCommunProb(
+  cellchat,
   type = "truncatedMean",
   trim = 0.1,
   raw.use = TRUE,
-  population.size = TRUE,
-  nboot = 200
+  population.size = FALSE,
+  nboot = 100
 )
 
-saveRDS(
-  cellchat2,
-  "data/processed/cellchat_run2_probabilities.rds"
-)
-
-# ------------------------------------------------------------
-# 8. FILTER COMMUNICATIONS
-# ------------------------------------------------------------
-
-cellchat2 <- filterCommunication(
-  cellchat2,
+# Filter communication results
+cellchat <- filterCommunication(
+  cellchat,
   min.cells = 10
 )
 
-df.net2 <- subsetCommunication(cellchat2)
+# Calculate pathway-level communication
+cellchat <- computeCommunProbPathway(cellchat)
+
+pathway_results <- cellchat@netP$pathways
+
+# Aggregate communication networks
+cellchat <- aggregateNet(cellchat)
+
+# Calculate network centrality
+cellchat <- netAnalysis_computeCentrality(
+  cellchat,
+  slot.name = "netP"
+)
+
+# Export ligand-receptor communications
+df.net <- subsetCommunication(cellchat)
 
 write.csv(
-  df.net2,
+  df.net,
   "results/tables/run2_filtered_communications.csv",
   row.names = FALSE
 )
 
-cat("\nFiltered interactions:", nrow(df.net2), "\n")
-
-# ------------------------------------------------------------
-# 9. COMPUTE PATHWAY COMMUNICATION
-# ------------------------------------------------------------
-
-cellchat2 <- computeCommunProbPathway(cellchat2)
-
-df.pathway2 <- subsetCommunication(
-  cellchat2,
+# Export pathway-level communications
+df.pathway <- subsetCommunication(
+  cellchat,
   slot.name = "netP"
 )
 
 write.csv(
-  df.pathway2,
+  df.pathway,
   "results/tables/run2_pathway_communications.csv",
   row.names = FALSE
 )
 
-# ------------------------------------------------------------
-# 10. AGGREGATE COMMUNICATION NETWORK
-# ------------------------------------------------------------
-
-cellchat2 <- aggregateNet(cellchat2)
-
-communication_count2 <- cellchat2@net$count
-communication_weight2 <- cellchat2@net$weight
-
-groupSize2 <- as.numeric(table(cellchat2@idents))
-
+# Save communication matrices
 write.csv(
-  communication_count2,
+  as.data.frame(cellchat@net$count),
   "results/tables/run2_communication_count.csv"
 )
 
 write.csv(
-  communication_weight2,
+  as.data.frame(cellchat@net$weight),
   "results/tables/run2_communication_weight.csv"
 )
 
-# ------------------------------------------------------------
-# 11. IDENTIFY PATHWAYS
-# ------------------------------------------------------------
-
-pathways2 <- cellchat2@netP$pathways
-
+# Save pathway names
 write.csv(
-  data.frame(pathway = pathways2),
+  data.frame(pathway = pathway_results),
   "results/tables/run2_identified_pathways.csv",
   row.names = FALSE
 )
 
-# ------------------------------------------------------------
-# 12. NETWORK CENTRALITY
-# ------------------------------------------------------------
-
-cellchat2 <- netAnalysis_computeCentrality(
-  cellchat2,
-  slot.name = "netP"
-)
-
-# ------------------------------------------------------------
-# 13. SAVE FINAL CELLCHAT OBJECT
-# ------------------------------------------------------------
-
+# Save final modified Run 2 object
 saveRDS(
-  cellchat2,
+  cellchat,
   "data/processed/cellchat_run2_final.rds"
 )
 
-# ------------------------------------------------------------
-# 14. FINAL SUMMARY
-# ------------------------------------------------------------
-
-cat("\n====================================\n")
-cat("RUN 2 ANALYSIS COMPLETED\n")
-cat("====================================\n")
-
-cat("Cells analysed:", ncol(data.run2), "\n")
-cat("Genes analysed:", nrow(data.run2), "\n")
-cat("Cell populations:", length(levels(cellchat2@idents)), "\n")
-cat("Filtered interactions:", nrow(df.net2), "\n")
-cat("Identified pathways:", length(pathways2), "\n")
-
-cat("\nRUN 2 ANALYSIS COMPLETED SUCCESSFULLY\n")
-
-# ------------------------------------------------------------
-# 15. RELEASE TEMPORARY DATA MEMORY
-# ------------------------------------------------------------
-
-rm(data.run2, meta.run2)
-gc()
+cat("\nRUN 2 COMPLETED\n")
+cat("Number of pathways:", length(pathway_results), "\n")
+cat("Number of interactions:", nrow(df.net), "\n")
+cat("Final object saved:",
+    file.exists("data/processed/cellchat_run2_final.rds"), "\n")
